@@ -1,13 +1,15 @@
+import { exitIntro } from "./introExit";
 
 class SpeedController{
     constructor(){
-        this.speed = 0.;
+        this.speed = 1.;
         this.acceleration = -0.05;
         this.accelVal = 0.05;
-        this.decelVal = -0.05;
+        this.decelVal = -0.1;
         // this.jerk = 0.005;
         this.maxSpeed = 15.;
-        this.minSpeed = 0.;
+        this.minSpeed = 1.;
+        this.exited = false;
 
         document.addEventListener("mousedown",this);
         document.addEventListener("mouseup",this);
@@ -19,8 +21,17 @@ class SpeedController{
     updateSpeed(ctx) {
         // console.log("updating speed", ctx.speed);
         ctx.speed += ctx.acceleration;
-        if (ctx.speed > ctx.maxSpeed) { ctx.speed = ctx.maxSpeed}
+
         if (ctx.speed < ctx.minSpeed) { ctx.speed = ctx.minSpeed}
+        if (ctx.speed > ctx.maxSpeed) {
+            ctx.speed = ctx.maxSpeed;
+            if (!ctx.exited) {
+                ctx.exited = true;
+                setTimeout(exitIntro,2000);
+                clearInterval(ctx.speedUpdater);
+            }
+
+        }
 
     }
 
@@ -30,7 +41,7 @@ class SpeedController{
 
     scheduleUpdate(ctx){
         console.log(ctx);
-        setInterval(ctx.updateSpeed,1000/20,ctx);
+        ctx.speedUpdater =  setInterval(ctx.updateSpeed,1000/20,ctx);
     }
 
     // Want to use mousedown and mouseup as well as touchstart and touchend to tell when accelerating or decelerating

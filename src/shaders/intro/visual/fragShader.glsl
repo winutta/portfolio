@@ -10,6 +10,11 @@ uniform float iSpeed;
 uniform float maxSpeed;
 uniform float minSpeed;
 
+uniform float exit;
+uniform float ready;
+
+uniform float rTime;
+
 #define PI 3.1415926538
 
 float smin( float a, float b, float k )
@@ -89,8 +94,8 @@ float stepper(vec2 uv) {
 
     float val = sin(a - d*speed*4. + speeder*4.) + d*d;
     // val = d-1.;
-    float transform = smoothstep(0.,1.1,speed);
-    // val = mix(val,d*d- 2.,transform);
+    float transform = smoothstep(0.,1.2,speed);
+    val = mix(val,d*d- 2.,transform);
     
     float s = smoothstep(0.,1.5*fwidth(-val),-val);
     
@@ -109,27 +114,70 @@ void main() {
 
   float n = noise(vec2(a*PI*4.*1.5,0.235));
 
-  float l = -length(p) - (cos(a*PI*2.*6.)+1.)/10.*0. + n*1. + -1. +transition*3.2; 
+  float l = -length(p)  + n*1. + -1. +transition*5.2; 
 
   float circle = smoothstep(0.,1.5*fwidth(l),l);
+
+
+  float l2 = -length(p) + n*1. + -1.  +(exit)*5.2; 
+
+  float circle2 = 1.-smoothstep(0.,1.5*fwidth(l2),l2);
 
   // vec3 col = vec3(1.,0.,1.);
 
   float o = stepper(uv);
   
-  vec3 col = vec3(o*circle);
+  vec3 col = vec3(o*circle*circle2);
 
   float la = getAngle(lpos.xy);
 
   float speed = (iSpeed - minSpeed)/(maxSpeed-minSpeed);
   speed = max(speed,0.);
   float transform = smoothstep(0.,1.,speed);
-  transform = 0.;
 
-  vec3 rotationColor = mix(vec3(0.5,0.4,0.9),vec3(0.7,0.5,0.4),transform) + cos(la*PI*2.*1. + iTime*4./5.)/5.;
+  // transform = 0.;
+
+  vec3 rotationColor = vec3(0.5,0.4,0.9) + cos(la*PI*2.*5. + iTime*4.)/5.;
 //   rotationColor = mix(rotationColor,vec3(0.2,0.6,0.8),transform);
 
-  col *= rotationColor;
+  // col *= rotationColor;
+
+  vec3 blinkColor1 = vec3(0.1,0.1,0.4);
+  vec3 blinkColor2 = vec3(1.,1.,0.8);
+
+  float xT = fract(rTime/2.);
+  float bK = .25;
+  float blink = smoothstep( .5-bK, 1.-bK -step(.5-bK,abs(xT-.5)) , xT-step(1.-bK,xT) );
+
+  xT = rTime*4.;
+  blink = (cos(xT + PI - sin(xT))+1.)/2.;
+  blink = (cos(xT)+1.)/2.;
+
+  float moving = smoothstep(0.,0.25,speed);
+  // float ready2 = smoothstep(1.,0.,transition);
+  blink = mix(blink,0.,max(moving,1.-ready));
+
+  vec3 bCol = mix(blinkColor1,blinkColor2, blink);
+
+  col *= bCol;
+
+  col *= mix(vec3(1.),rotationColor, transform);
+  // col *= mix(1.,1.5,transform2);
+
+  float topSpeed = smoothstep(0.5,1.,speed);
+  float topSpeed2 = smoothstep(0.8,1.,speed);
+  float topSpeed3 = smoothstep(0.99,1.,speed);
+
+  col *= mix(1.,5.5,topSpeed);
+  col *= mix(1., 5.5, topSpeed2);
+  col *= mix(1., 1.3, topSpeed3);
+  // col = rotationColor;
+
+  // col *= rotationColor;
+
+  // col *= (blinkColor+blink*.5);
+
+  // col = mix(col,blinkColor*col,blink);
   
   col = pow(col,vec3(1./2.2));
 

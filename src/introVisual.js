@@ -7,15 +7,19 @@ import fragShader from "./shaders/intro/visual/fragShader.glsl"
 import {gsap} from "gsap"
 
 import { speedController } from './speedController'
+import { exitIntro } from './introExit'
 
 var shaderGeometry = new THREE.PlaneGeometry(1,1,10,10);
 var shaderMaterial = new THREE.ShaderMaterial({
     uniforms: {
+        rTime: {value: 0},
         iTime: {value: 0},
         iSpeed: {value: 1.},
         maxSpeed: {value: speedController.maxSpeed},
         minSpeed: {value: speedController.minSpeed},
         transition: {value: 0},
+        exit: {value: 0},
+        ready: {value: 0},
     },
     vertexShader: vertShader,
     fragmentShader: fragShader,
@@ -26,7 +30,9 @@ var shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
 shaderMesh.progressSpeed = 0.;
 shaderMesh.setProgress = function(){
     gsap.to(shaderMesh, { progressSpeed: 1, duration: 2, onComplete: speedController.scheduleUpdate, onCompleteParams: [speedController]  });
-    gsap.to(speedController, {speed: 3, duration: 2});
+    gsap.to(shaderMaterial.uniforms.ready, {value: 1, duration: 2.})
+    // setTimeout(exitIntro,13000);
+    // gsap.to(speedController, {speed: 3, duration: 2});
 }
 
 var y = -1.75;
@@ -48,7 +54,9 @@ var updateTime = function(time){
 
     
 
-    // time *= 0.001;
+    time *= 0.001;
+    shaderMaterial.uniforms.rTime.value = time;
+
     // shaderMaterial.uniforms.iTime.value = time;
 
 }

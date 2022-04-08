@@ -7,6 +7,7 @@ varying vec3 n;
 uniform float iTime;
 
 uniform float transition;
+uniform float exit;
 
 float getAngle(vec2 v1)
 {
@@ -49,11 +50,17 @@ void main() {
 
   float n = noise(vec2(a*PI*4.*1.5,0.235));
 
-  float l = -length(p) - (cos(a*PI*2.*6.)+1.)/10.*0. +n*1. +-1.  +transition*3.2;
+  float l = -length(p) + n*1. + -1.  +transition*5.2;
 
   float circle = smoothstep(0.,1.5*fwidth(l),l);
 
-  vec3 col = vec3(circle);
+  
+  float l2 = -length(p) + n*1. + -1.  +(exit)*5.2; 
+
+  float circle2 = 1.-smoothstep(0.,1.5*fwidth(l2),l2);
+
+
+  vec3 col = vec3(circle*circle2);
 
   
 

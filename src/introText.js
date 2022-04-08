@@ -43,6 +43,7 @@ function TextObj(inputText, fontSize = 0.5, maxWidth){
         uniforms: {
             iTime: {value: 0},
             transition: {value: 0.},
+            exit: {value: 0.},
         },
         vertexShader: vertShader,
         fragmentShader: fragShader,

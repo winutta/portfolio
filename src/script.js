@@ -9,13 +9,14 @@ import {setup} from "./setup"
 import {text} from "./introText"
 import * as v from "./introVisual"
 
+import * as e from "./introExit"
+
 
 function main() {
 
 // BASIC SETUP
 
 var {scene,camera,renderer} = setup;
-console.log(v);
 
 // RENDER LOOP
 
